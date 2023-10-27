@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.util.Log
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import kotlin.concurrent.thread
 
 private const val TAG = "MainActivity"
 class MainActivity : AppCompatActivity() {
@@ -11,7 +12,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         Log.d(TAG, "this is where the app crashed before")
-        val helloTextView: TextView = findViewById(R.id.hello_world)
+        val helloTextView: TextView = findViewById(R.id.division_textview)
         Log.d(TAG, "this should be logged if the bug is fixed")
         helloTextView.text = "Hello, debugging!"
         logging()
@@ -20,9 +21,14 @@ class MainActivity : AppCompatActivity() {
     private val numerator = 60
     private var denominator = 4
     private fun division() {
-        repeat(4) {
-            Log.v(TAG, "${numerator / denominator}")
-            denominator--
+        thread(start = true) {
+            repeat(4) {
+                Thread.sleep(3000)
+                runOnUiThread {
+                    findViewById<TextView>(R.id.division_textview).setText("${numerator / denominator}")
+                    denominator--
+                }
+            }
         }
     }
     private fun logging() {
@@ -31,6 +37,6 @@ class MainActivity : AppCompatActivity() {
         Log.i(TAG, "INFO: reporting technical information, such as an operation succeeding")
         Log.d(TAG, "DEBUG: reporting technical information useful for debugging")
         Log.d(TAG, "$denominator")
-        Log.v(TAG, "VERBOSE: more verbose than DEBUG logs")
+        findViewById<TextView>(R.id.division_textview).setText("${numerator / denominator}")
     }
 }
